@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details - College Event Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        .details-layout {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .details-poster {
+            width: 100%;
+            height: auto;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .event-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+            background: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .meta-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.1);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .details-layout {
+                grid-template-columns: 1fr;
+            }
+            .event-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <ion-icon name="calendar-outline" style="margin-right:0.5rem"></ion-icon> Event Hub
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item">
+                <ion-icon name="home-outline"></ion-icon> Dashboard
+            </a>
+            <a href="events.html" class="menu-item">
+                <ion-icon name="list-outline"></ion-icon> Events
+            </a>
+            <a href="calendar.html" class="menu-item">
+                <ion-icon name="calendar-number-outline"></ion-icon> Calendar
+            </a>
+            <a href="register.html" class="menu-item active">
+                <ion-icon name="document-text-outline"></ion-icon> Register
+            </a>
+            <a href="admin.html" class="menu-item">
+                <ion-icon name="settings-outline"></ion-icon> Admin Panel
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <ion-icon name="menu-outline" class="hamburger" id="hamburger"></ion-icon>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">🌙</button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <div class="glass-card">
+                <div id="eventDetails">
+                    <p>Loading event details...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/dashboard.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const eventDetailsContainer = document.getElementById('eventDetails');
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get('id');
+
+            if (!eventId) {
+                eventDetailsContainer.innerHTML = '<p style="color:red;">No event specified.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/events/${eventId}`);
+                if (!response.ok) throw new Error('Event not found');
+                const event = await response.json();
+
+                const posterUrl = event.poster_image ? `http://localhost:5000${event.poster_image}` : 'https://placehold.co/800x1200/eeeeee/999999?text=Event+Poster';
+
+                eventDetailsContainer.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <div style="color:var(--primary-color); font-weight:600; font-size:1.2rem; margin-bottom:0.5rem;">${formatDate(event.event_date)}</div>
+                            <h2 style="font-size: 3rem; margin-bottom: 0.5rem;">${event.event_name}</h2>
+                            <div class="countdown" style="display:inline-block; font-size:1.1rem;" data-date="${event.event_date}">Loading timer...</div>
+                        </div>
+                        <a href="register.html?event_id=${event.id}" class="btn btn-primary" style="font-size: 1.25rem; padding: 1rem 2rem;">Register Now</a>
+                    </div>
+                    
+                    <div class="details-layout">
+                        <div>
+                            <img src="${posterUrl}" alt="Event Poster" class="details-poster">
+                        </div>
+                        
+                        <div>
+                            <div class="event-meta">
+                                <div class="meta-item">
+                                    <ion-icon name="location-outline" class="meta-icon"></ion-icon>
+                                    <div>
+                                        <p style="color:#6b7280; font-size:0.875rem;">Venue</p>
+                                        <p style="font-weight:600; font-size:1.1rem;">${event.venue}</p>
+                                    </div>
+                                </div>
+                                <div class="meta-item">
+                                    <ion-icon name="time-outline" class="meta-icon"></ion-icon>
+                                    <div>
+                                        <p style="color:#6b7280; font-size:0.875rem;">Time</p>
+                                        <p style="font-weight:600; font-size:1.1rem;">${event.time}</p>
+                                    </div>
+                                </div>
+                                <div class="meta-item">
+                                    <ion-icon name="business-outline" class="meta-icon"></ion-icon>
+                                    <div>
+                                        <p style="color:#6b7280; font-size:0.875rem;">Organizer</p>
+                                        <p style="font-weight:600; font-size:1.1rem;">${event.organizer}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">About the Event</h3>
+                            <p style="line-height: 1.8; color: var(--text-dark); font-size: 1.1rem;">
+                                ${event.description.replace(/\n/g, '<br>')}
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                updateCountdowns();
+            } catch (error) {
+                console.error(error);
+                eventDetailsContainer.innerHTML = '<p style="color:red;">Failed to load event details.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

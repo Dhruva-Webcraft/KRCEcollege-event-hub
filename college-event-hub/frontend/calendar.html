@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar - College Event Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .cal-btn {
+            background: var(--bg-color);
+            border: 1px solid var(--glass-border);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .cal-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .calendar-container {
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            overflow: hidden;
+            background: var(--white);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e5e7eb;
+        }
+
+        [data-theme="dark"] .calendar-grid {
+            background: #374151;
+        }
+
+        .calendar-header {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+            padding: 1rem;
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+        }
+
+        .calendar-cell {
+            background: var(--white);
+            min-height: 120px;
+            padding: 0.5rem;
+            position: relative;
+            transition: background 0.2s;
+        }
+
+        .calendar-cell:hover {
+            background: rgba(79, 70, 229, 0.02);
+        }
+
+        .calendar-cell .date-num {
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            text-align: center;
+            line-height: 25px;
+            border-radius: 50%;
+        }
+
+        .calendar-cell.today .date-num {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .calendar-cell.empty {
+            background: var(--bg-color);
+        }
+
+        .cal-event-pill {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            margin-bottom: 0.25rem;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .cal-event-pill:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 768px) {
+            .calendar-header {
+                font-size: 0.7rem;
+                padding: 0.5rem;
+            }
+            .calendar-cell {
+                min-height: 80px;
+                padding: 0.2rem;
+            }
+            .cal-event-pill {
+                font-size: 0.65rem;
+                padding: 0.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <!-- identical to other files -->
+        <div class="sidebar-header">
+            <ion-icon name="calendar-outline" style="margin-right:0.5rem"></ion-icon> Event Hub
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item">
+                <ion-icon name="home-outline"></ion-icon> Dashboard
+            </a>
+            <a href="events.html" class="menu-item">
+                <ion-icon name="list-outline"></ion-icon> Events
+            </a>
+            <a href="calendar.html" class="menu-item active">
+                <ion-icon name="calendar-number-outline"></ion-icon> Calendar
+            </a>
+            <a href="register.html" class="menu-item">
+                <ion-icon name="document-text-outline"></ion-icon> Register
+            </a>
+            <a href="admin.html" class="menu-item">
+                <ion-icon name="settings-outline"></ion-icon> Admin Panel
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <ion-icon name="menu-outline" class="hamburger" id="hamburger"></ion-icon>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">🌙</button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <div class="glass-card">
+                
+                <div class="calendar-controls">
+                    <button class="cal-btn" id="prevMonth"><ion-icon name="chevron-back-outline"></ion-icon> Prev</button>
+                    <h2 id="monthYearDisplay" style="font-size:1.5rem; margin:0;">Loading...</h2>
+                    <button class="cal-btn" id="nextMonth">Next <ion-icon name="chevron-forward-outline"></ion-icon></button>
+                </div>
+
+                <div class="calendar-container">
+                    <div class="calendar-grid">
+                        <div class="calendar-header">Sun</div>
+                        <div class="calendar-header">Mon</div>
+                        <div class="calendar-header">Tue</div>
+                        <div class="calendar-header">Wed</div>
+                        <div class="calendar-header">Thu</div>
+                        <div class="calendar-header">Fri</div>
+                        <div class="calendar-header">Sat</div>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- cells injected -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="js/dashboard.js"></script>
+    <script src="js/calendar.js"></script>
+</body>
+</html>

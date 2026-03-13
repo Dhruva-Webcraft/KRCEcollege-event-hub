@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - College Event Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Ionicons for Icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <h1 style="font-size: 3rem; margin-bottom: 1rem;">K. RAMAKRISHNAN COLLEGE OF ENGINEERING </h1>
+        <p style="font-size: 1.25rem;">Welcome to OUR College Event Hub</p>
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <ion-icon name="calendar-outline" style="margin-right:0.5rem"></ion-icon> Event Hub
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item active">
+                <ion-icon name="home-outline"></ion-icon> Dashboard
+            </a>
+            <a href="events.html" class="menu-item">
+                <ion-icon name="list-outline"></ion-icon> Events
+            </a>
+            <a href="calendar.html" class="menu-item">
+                <ion-icon name="calendar-number-outline"></ion-icon> Calendar
+            </a>
+            <a href="register.html" class="menu-item">
+                <ion-icon name="document-text-outline"></ion-icon> Register
+            </a>
+            <a href="admin.html" class="menu-item">
+                <ion-icon name="settings-outline"></ion-icon> Admin Panel
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main ContentWrapper -->
+    <main class="main-content">
+        <!-- Top Navigation -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <ion-icon name="menu-outline" class="hamburger" id="hamburger"></ion-icon>
+                <div class="search-bar">
+                    <ion-icon name="search-outline"></ion-icon>
+                    <input type="text" placeholder="Search anywhere...">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">🌙</button>
+                <button class="profile-btn"><ion-icon name="person-circle-outline"
+                        style="font-size: 1.5rem;"></ion-icon></button>
+            </div>
+        </header>
+
+        <!-- Dynamic Content injected here -->
+        <div class="content-area">
+            <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;">Dashboard Overview</h2>
+
+            <div class="stats-grid">
+                <div class="glass-card stat-card" style="background: linear-gradient(135deg, #4f46e5, #3b82f6);">
+                    <div class="stat-icon" style="background: rgba(255,255,255,0.2);">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                    </div>
+                    <div class="stat-info" style="color: white;">
+                        <h3 id="totalEvents">0</h3>
+                        <p style="color: #e0e7ff;">Total Events</p>
+                    </div>
+                </div>
+
+                <div class="glass-card stat-card" style="background: linear-gradient(135deg, #7c3aed, #ec4899);">
+                    <div class="stat-icon" style="background: rgba(255,255,255,0.2);">
+                        <ion-icon name="people-outline"></ion-icon>
+                    </div>
+                    <div class="stat-info" style="color: white;">
+                        <h3 id="totalRegistrations">0</h3>
+                        <p style="color: #f3e8ff;">Total Registrations</p>
+                    </div>
+                </div>
+
+                <div class="glass-card stat-card" style="background: linear-gradient(135deg, #10b981, #34d399);">
+                    <div class="stat-icon" style="background: rgba(255,255,255,0.2);">
+                        <ion-icon name="trending-up-outline"></ion-icon>
+                    </div>
+                    <div class="stat-info" style="color: white;">
+                        <h3 id="upcomingEvents">0</h3>
+                        <p style="color: #d1fae5;">Upcoming Events</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 1rem;">Recent Featured Events</h3>
+            <div class="events-grid" id="featuredEvents">
+                <p>Loading summary...</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/dashboard.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Fetch stats
+                const evRes = await fetch(`${API_BASE_URL}/events`);
+                const events = await evRes.json();
+
+                const regRes = await fetch(`${API_BASE_URL}/registrations`);
+                const registrations = await regRes.json();
+
+                document.getElementById('totalEvents').innerText = events.length;
+                document.getElementById('totalRegistrations').innerText = registrations.length;
+
+                const upcoming = events.filter(e => new Date(e.event_date).getTime() > new Date().getTime());
+                document.getElementById('upcomingEvents').innerText = upcoming.length;
+
+                // Render top 2 featured
+                const featured = events.slice(0, 2);
+                document.getElementById('featuredEvents').innerHTML = featured.map(e => {
+                    const posterUrl = e.poster_image ? `http://localhost:5000${e.poster_image}` : 'https://placehold.co/600x400/eeeeee/999999?text=No+Poster';
+                    return `
+                        <div class="glass-card event-card">
+                            <img src="${posterUrl}" alt="Event" class="event-poster">
+                            <div class="event-content">
+                                <h3 style="margin-bottom: 0.5rem; font-size: 1.25rem;">${e.event_name}</h3>
+                                <p style="color: var(--primary-color); font-size: 0.875rem; font-weight: 500;">
+                                    <ion-icon name="calendar-outline" style="vertical-align: middle"></ion-icon> ${formatDate(e.event_date)}
+                                </p>
+                                <div class="countdown" data-date="${e.event_date}">Loading timer...</div>
+                                <a href="event-details.html?id=${e.id}" class="btn btn-outline" style="margin-top: 1rem;">View Details</a>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                updateCountdowns();
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+                document.getElementById('featuredEvents').innerHTML = 'Error loading content. Check backend connection.';
+            }
+        });
+    </script>
+</body>
+
+</html>

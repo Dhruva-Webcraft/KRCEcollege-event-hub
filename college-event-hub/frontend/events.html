@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - College Event Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        .filter-bar {
+            background: var(--glass-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+            gap: 0.5rem;
+        }
+
+        .view-btn {
+            background: var(--bg-color);
+            border: 1px solid var(--glass-border);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        .view-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Table layout toggle */
+        .events-table-view {
+            display: none;
+        }
+
+        .events-table-view.active {
+            display: block;
+        }
+
+        .events-grid-view.active {
+            display: grid;
+        }
+
+        .events-grid-view {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar (Same structure) -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <ion-icon name="calendar-outline" style="margin-right:0.5rem"></ion-icon> Event Hub
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item">
+                <ion-icon name="home-outline"></ion-icon> Dashboard
+            </a>
+            <a href="events.html" class="menu-item active">
+                <ion-icon name="list-outline"></ion-icon> Events
+            </a>
+            <a href="calendar.html" class="menu-item">
+                <ion-icon name="calendar-number-outline"></ion-icon> Calendar
+            </a>
+            <a href="register.html" class="menu-item">
+                <ion-icon name="document-text-outline"></ion-icon> Register
+            </a>
+            <a href="admin.html" class="menu-item">
+                <ion-icon name="settings-outline"></ion-icon> Admin Panel
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <ion-icon name="menu-outline" class="hamburger" id="hamburger"></ion-icon>
+                <div class="search-bar">
+                    <ion-icon name="search-outline"></ion-icon>
+                    <input type="text" id="globalSearch" placeholder="Search events wrapper...">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">🌙</button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;">Explore Events</h2>
+
+            <div class="filter-bar">
+                <div>
+                    <label>Search Event Name</label>
+                    <input type="text" id="searchName" class="form-control" placeholder="e.g. Hackathon">
+                </div>
+                <div>
+                    <label>Filter Organizer</label>
+                    <input type="text" id="searchOrganizer" class="form-control" placeholder="e.g. Computer Science">
+                </div>
+                <div>
+                    <label>Filter Date</label>
+                    <input type="date" id="searchDate" class="form-control">
+                </div>
+            </div>
+
+            <div class="view-toggle">
+                <button class="view-btn active" id="btnGridView" title="Grid View">
+                    <ion-icon name="grid-outline"></ion-icon>
+                </button>
+                <button class="view-btn" id="btnTableView" title="Table View">
+                    <ion-icon name="list-outline"></ion-icon>
+                </button>
+            </div>
+
+            <div class="events-grid events-grid-view active" id="eventsGrid">
+                <!-- Injected via JS -->
+                <p>Loading events...</p>
+            </div>
+
+            <div class="glass-card events-table-view table-responsive" id="eventsTableContainer">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Poster</th>
+                            <th>Event Name</th>
+                            <th>Date</th>
+                            <th>Organizer</th>
+                            <th>Timer</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsTableBody">
+                        <!-- Injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/dashboard.js"></script>
+    <script src="js/events.js"></script>
+</body>
+</html>
